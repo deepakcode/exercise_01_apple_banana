@@ -1,4 +1,4 @@
-# Helloworld AI/ML — Image Classification (Apples vs Bananas)
+# Helloworld AI/ML — Image Classification
 
 Building a machine learning model from scratch on your Mac is an excellent way to learn the entire process. Here is a detailed, step-by-step guide covering everything from setting up your environment to training and testing your model.
 
