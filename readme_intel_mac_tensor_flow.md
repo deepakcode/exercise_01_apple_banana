@@ -1,98 +1,161 @@
 # README — Machine learning on an Intel macOS (MacBook Pro 16-inch, 2019)
 
-This README contains step-by-step instructions for setting up and using a TensorFlow-based machine learning environment on your Intel Mac. It also includes an automated setup script (`setup_ml_env.sh`) that will recreate your environment exactly from the provided `requirements.txt`.
+This README replaces the previous generic macOS instructions with tested, copy-paste commands and troubleshooting tips for your exact setup:
 
 - **Machine:** MacBook Pro (16-inch, 2019) — Intel Core i7/i9 (6-core), 16 GB RAM
 - **macOS:** Sequoia 15.5
 - **Python:** Use **Python 3.11** (TensorFlow is not supported on Python 3.12+)
-- **TensorFlow:** CPU build for Intel macs (confirmed working: `2.16.2`)
+- **TensorFlow:** CPU build for Intel macs (example here uses `tensorflow` — confirmed working: `2.16.2` on your machine)
 
 ---
 
-## 1. Quick Start (Recommended)
-If you want a one-shot setup with no manual steps, use the provided **setup script**. It installs Python 3.11 (via Homebrew), creates a virtual environment, installs everything from `requirements.txt`, and verifies TensorFlow.
+## 1. Overview / Goal
+Get a reproducible development environment for training simple TensorFlow models on an Intel mac. We will create a virtual environment, install Python 3.11 (via Homebrew), ensure `pip` is available, install TensorFlow and the usual ML libraries, and verify everything works with a tiny test script.
 
-### Run setup script
+---
+
+## 2. Prerequisites
+- Homebrew installed (recommended). If you don't have it:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+- You should not try to install TensorFlow with **system Python** or an unsupported Python (3.12+). Use Python 3.11.
+
+---
+
+## 3. Step-by-step commands (copy-paste)
+Run these commands in Terminal. They install Python 3.11, create a venv, and install the required packages.
+
+```bash
+# 1) Install Python 3.11 via Homebrew
+brew update
+brew install python@3.11
+
+# 2) Confirm Python 3.11 is available
+python3.11 --version
+
+# 3) Create a virtual environment (in project folder or home)
+# from your project directory (recommended):
+python3.11 -m venv my_ml_env
+
+# 4) Activate the virtual environment
+source my_ml_env/bin/activate
+
+# 5) Ensure pip is present and up-to-date
+python -m ensurepip --upgrade
+pip install --upgrade pip setuptools wheel
+
+# 6) Install TensorFlow and other libraries
+# Pin to a compatible range; this works for Intel mac + Python 3.11
+pip install "tensorflow<2.19" numpy matplotlib scikit-learn
+
+# 7) Quick verification (should print TF version, e.g. 2.16.2)
+python -c "import sys, tensorflow as tf; print('Python', sys.version.split()[0]); print('TensorFlow', tf.__version__)"
+```
+
+If you already have a working venv (like `my_ml_env`) and `python -c "import tensorflow as tf; print(tf.__version__)"` printed `2.16.2` as you showed, you're good to go.
+
+---
+
+## 4. One-shot setup script (optional)
+Save the following as `setup_ml_env.sh` and run it. It automates the steps above.
+
+```bash
+#!/usr/bin/env bash
+set -e
+
+# Install Python 3.11 (Homebrew must be installed first)
+brew update
+brew install python@3.11
+
+# Create venv in current directory
+python3.11 -m venv my_ml_env
+source my_ml_env/bin/activate
+python -m ensurepip --upgrade
+pip install --upgrade pip setuptools wheel
+
+# Install ML libraries (cpu TensorFlow for Intel Macs)
+pip install "tensorflow<2.19" numpy matplotlib scikit-learn
+
+# Final check
+python -c "import sys, tensorflow as tf; print('Python', sys.version.split()[0]); print('TensorFlow', tf.__version__)"
+
+echo "\nSetup complete. Activate with: source my_ml_env/bin/activate"
+```
+
+To run:
+
 ```bash
 chmod +x setup_ml_env.sh
 ./setup_ml_env.sh
 ```
 
-After it finishes, activate your environment:
-```bash
-source my_ml_env/bin/activate
+---
+
+## 5. Quick test script (to confirm training works)
+Save as `quick_test_tf.py` then run `python quick_test_tf.py` inside the activated venv.
+
+```python
+# quick_test_tf.py
+import sys
+import numpy as np
+import tensorflow as tf
+
+print('Python', sys.version.split()[0])
+print('TensorFlow', tf.__version__)
+
+# tiny synthetic dataset
+x = np.random.random((128, 10)).astype('float32')
+y = np.random.randint(0, 2, (128, 1)).astype('float32')
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(32, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(x, y, epochs=2, batch_size=16)
+print('Quick test finished')
 ```
 
-That’s it — you now have TensorFlow, NumPy, Matplotlib, and Scikit-learn installed.
+This does a short 2-epoch run on random data and confirms end-to-end functionality.
 
 ---
 
-## 2. Manual Setup (if you prefer step-by-step)
-
-### Install Homebrew
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-### Install Python 3.11
-```bash
-brew install python@3.11
-```
-
-### Create a Virtual Environment
-```bash
-python3.11 -m venv my_ml_env
-source my_ml_env/bin/activate
-```
-
-### Upgrade pip and install dependencies
-```bash
-python -m ensurepip --upgrade
-pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
-```
-
-### Verify TensorFlow installation
-```bash
-python -c "import tensorflow as tf; print(tf.__version__)"
-```
-
-You should see `2.16.2` (or similar).
-
----
-
-## 3. Training a Simple CNN
-Once the environment is ready, you can use the provided sample script (`train_model.py`) to train a CNN on images of apples and bananas. It demonstrates:
-- Loading images using `image_dataset_from_directory`
-- Defining a CNN with convolution, pooling, and dense layers
-- Training for 10 epochs
-- Plotting training/validation accuracy and loss with Matplotlib
-- Running inference on new images
-
----
-
-## 4. Troubleshooting
+## 6. Common problems & fixes
 
 ### `zsh: command not found: pip`
-Make sure you activated the virtual environment. If still an issue, run:
+- You probably activated a Python installation that doesn't expose `pip` on PATH. Use the venv activation above, then run `python -m pip` if `pip` is still not found:
+
 ```bash
 python -m pip install --upgrade pip
 ```
 
-### Python 3.13 or 3.12 installed
-TensorFlow currently does not support 3.12+ on macOS. Always use Python 3.11.
+### You have Python 3.13 (or 3.12+)
+- TensorFlow currently does not support Python versions newer than 3.11 on macOS. Install Python 3.11 via Homebrew and create a venv from it (`python3.11 -m venv ...`).
 
-### AVX2/FMA warning
-This is an informational log only. You can ignore it — TensorFlow works fine without CPU-specific optimizations.
+### `This TensorFlow binary is optimized to use available CPU instructions... AVX2 FMA` (INFO)
+- This is an informational message. The prebuilt TensorFlow you installed is functional on Intel CPUs but was not compiled with some CPU-specific optimizations. You can ignore this unless you want to compile TensorFlow from source to squeeze out a small additional CPU speed improvement (this is advanced and time-consuming).
 
-### Apple Silicon notes
-Do NOT install `tensorflow-macos` or `tensorflow-metal` on Intel Macs. Those are only for M1/M2/M3.
+### GPU / Apple Silicon notes
+- **Intel Mac (your machine)**: `tensorflow-metal` and `tensorflow-macos` are *for Apple Silicon* (M1/M2/M3). Do NOT install `tensorflow-macos` on Intel mac.
+- If you *ever* move to Apple Silicon, the recommended packages differ.
 
 ---
 
-## 5. Reproducibility
-- Your exact working environment is captured in `requirements.txt`. 
-- To recreate the same setup elsewhere:
+## 7. Tips & next steps
+- Use `python -m pip` inside the venv for absolute reliability.
+- Keep your venv per-project to avoid dependency conflicts.
+- If you want a reproducible environment for sharing, create a `requirements.txt` after you install packages:
+
+```bash
+pip freeze > requirements.txt
+```
+
+- To recreate elsewhere:
+
 ```bash
 python3.11 -m venv my_ml_env
 source my_ml_env/bin/activate
@@ -101,12 +164,8 @@ pip install -r requirements.txt
 
 ---
 
-## 6. Next Steps
-- Use the `setup_ml_env.sh` script whenever you need a clean environment.
-- Train your own dataset using the CNN example in `train_model.py`.
-- Add new libraries to `requirements.txt` as your project grows.
-
----
-
-This guide ensures that your Intel Mac is correctly set up for TensorFlow-based ML projects, with both an automated and manual path available.
+If you'd like, I can:
+- Add this README as an actual `README.md` file in your project folder (provide path),
+- Produce a `requirements.txt` pinned to the versions on your machine (I can detect versions if you run `pip freeze` and paste the output), or
+- Expand the test script to load your apples/bananas dataset and run a small training job using `image_dataset_from_directory` (the example in your original README).
 
