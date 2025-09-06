@@ -1,0 +1,97 @@
+(my_ml_env) deepakvishwakarma@Deepaks-MacBook-Pro helloworld_ai_ml % git push
+Enumerating objects: 27255, done.
+Counting objects: 100% (27255/27255), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (22152/22152), done.
+Writing objects: 100% (27252/27252), 409.74 MiB | 5.78 MiB/s, done.
+Total 27252 (delta 4419), reused 27238 (delta 4415), pack-reused 0
+remote: Resolving deltas: 100% (4419/4419), completed with 1 local object.
+remote: warning: File my_ml_env/lib/python3.11/site-packages/numpy/.dylibs/libopenblas64_.0.dylib is 66.13 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB
+remote: warning: File my_ml_env/lib/python3.11/site-packages/clang/native/libclang.dylib is 79.47 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB
+remote: error: Trace: e107ca14586bae1f7d6a03af2003e5f97e146d7e771b59293f793408422f681e
+remote: error: See https://gh.io/lfs for more information.
+remote: error: File my_ml_env/lib/python3.11/site-packages/tensorflow/libtensorflow_cc.2.dylib is 661.36 MB; this exceeds GitHub's file size limit of 100.00 MB
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.
+To https://github.com/deepakcode/helloworld_ai_ml.git
+ ! [remote rejected]   main -> main (pre-receive hook declined)
+error: failed to push some refs to 'https://github.com/deepakcode/helloworld_ai_ml.git'
+(my_ml_env) deepakvishwakarma@Deepaks-MacBook-Pro helloworld_ai_ml % git pull
+Already up to date.
+
+
+#Fix:
+
+Ah, I see the problem 👀
+
+You accidentally **committed your whole virtual environment (`my_ml_env/`)** to Git.
+That includes big binaries like TensorFlow’s `.dylib` files (hundreds of MB). GitHub blocks files >100 MB.
+
+---
+
+## ✅ Fix
+
+### 1. Remove the virtual environment from Git tracking
+
+Run these commands in your project root:
+
+```bash
+# Remove venv from Git index (but keep it locally)
+git rm -r --cached my_ml_env/
+
+# Commit the removal
+git commit -m "Remove virtual environment from repo"
+```
+
+---
+
+### 2. Add `my_ml_env/` to `.gitignore`
+
+Create or edit `.gitignore` in your repo root and add:
+
+```
+# Ignore virtual environments
+my_ml_env/
+```
+
+Also add other generated stuff you don’t want in Git:
+
+```
+__pycache__/
+*.pyc
+.DS_Store
+```
+
+Commit that too:
+
+```bash
+git add .gitignore
+git commit -m "Add .gitignore to ignore venv and temp files"
+```
+
+---
+
+### 3. Push again
+
+```bash
+git push
+```
+
+Now it should succeed, since the large files are no longer being tracked.
+
+---
+
+## ⚡ Why this works
+
+* Virtual environments (`my_ml_env/`) should **never be committed** to Git — they contain binaries and are platform-specific.
+* Instead, only commit your **source code + requirements.txt**.
+* Anyone else can recreate the venv using:
+
+  ```bash
+  python3.11 -m venv my_ml_env
+  source my_ml_env/bin/activate
+  pip install -r requirements.txt
+  ```
+
+---
+
+👉 Do you want me to also give you a **ready-to-use `.gitignore` file for Python ML projects** (covers venvs, Jupyter notebooks, cache files, etc.) so you don’t hit this again?

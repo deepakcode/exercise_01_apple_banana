@@ -13,4 +13,4 @@ __pycache__/
 *.pyc
 
 # Ignore macOS junk files
-.DS_Store
+.DS_Storemy_ml_env/
