@@ -168,5 +168,32 @@ This is a comprehensive overview of setting up your Mac, preparing a dataset, an
 
 This video provides an excellent guide on how to set up TensorFlow on a Mac with Apple Silicon (M1/M2/M3) for GPU acceleration, which is a key step in building a machine learning environment on a modern Mac.
 
-[Install TensorFlow on your Mac M1/M2/M3 with GPU Support](https://www.youtube.com/watch?v=Ju0ndy2kwlw)
-http://googleusercontent.com/youtube_content/0
+
+To run the train_model.py script, first activate your virtual environment if you haven't already:
+
+
+source my_ml_env/bin/activate
+Then run the script:
+
+python data/train_model.py
+
+This will train your CNN model on the images in the data directory and display training/validation accuracy and loss plots.
+
+# can you help me check if required data is present inside data folder?
+
+You can check if the required data is present in the data folder by listing its contents in your terminal. Run this command from your project root:
+
+ls -l data
+
+You should see one subfolder per class (e.g., cats, dogs, etc.), each containing images. The folder structure should look like:
+
+data/
+  class1/
+    img1.jpg
+    img2.jpg
+    ...
+  class2/
+    img1.jpg
+    ...
+
+If you see this structure, your data is ready for training. If not, you may need to organize your images into class-named subfolders inside data.
