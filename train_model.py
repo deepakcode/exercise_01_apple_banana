@@ -88,3 +88,8 @@ plt.show()
 # predictions = model.predict(img_array)
 # score = tf.nn.softmax(predictions[0])
 # print(f"This image is a {class_names[tf.argmax(score)]} with {100 * tf.reduce_max(score)}% confidence.")
+
+
+# Save the trained model
+model.save("saved_model.keras")
+print("✅ Model saved to 'saved_model/' folder")
