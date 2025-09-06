@@ -1,0 +1,8 @@
+import kagglehub
+
+	# Download latest version
+	path = kagglehub.dataset_download("mbkinaci/fruit-images-for-object-detection")
+
+	print("Path to dataset files:", path)
+
+https://www.kaggle.com/datasets/mbkinaci/fruit-images-for-object-detection?resource=download
