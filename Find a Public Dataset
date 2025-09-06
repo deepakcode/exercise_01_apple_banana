@@ -5,4 +5,5 @@ import kagglehub
 
 	print("Path to dataset files:", path)
 
+Download link:
 https://www.kaggle.com/datasets/mbkinaci/fruit-images-for-object-detection?resource=download
