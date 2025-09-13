@@ -1,5 +1,7 @@
 # Helloworld AI/ML — Image Classification
 
+![exercise_01_apple_banana.png](exercise_01_apple_banana.png)
+
 Building a machine learning model from scratch on your Mac is an excellent way to learn the entire process. Here is a detailed, step-by-step guide covering everything from setting up your environment to training and testing your model.
 
 This is a beginner-friendly machine learning project for image classification, built to run on **Intel macOS** (tested on MacBook Pro 16-inch, 2019). The project uses **TensorFlow (CPU build)** along with NumPy, Matplotlib, and Scikit-learn.
